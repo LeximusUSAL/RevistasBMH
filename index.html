@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Musical - Revistas de Bilbao e Hispanoamericana</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c2c2c;
+            --secondary-color: #8B4B3B;
+            --accent-color: #A0282F;
+            --success-color: #6B4E3D;
+            --warning-color: #B85450;
+            --background-light: #f5f5f5;
+            --text-light: #6c6c6c;
+            --shadow: 0 5px 15px rgba(0,0,0,0.15);
+            --shadow-hover: 0 10px 30px rgba(0,0,0,0.25);
+            --gradient-bg: linear-gradient(135deg, #2c2c2c 0%, #4a4a4a 100%);
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: var(--primary-color);
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid var(--secondary-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.3em;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            background: var(--background-light);
+            border: 2px solid var(--secondary-color);
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: var(--primary-color);
+        }
+
+        .nav-tab:hover, .nav-tab.active {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--secondary-color);
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            background: white;
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        .chart-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        .list-item {
+            background: var(--background-light);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .list-item:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateX(5px);
+            border-left-color: var(--accent-color);
+        }
+
+        .rank-badge {
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .metodologia {
+            background: var(--gradient-bg);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metodologia h3 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: white;
+        }
+
+        .metodologia-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .metodologia-item {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .metodologia-item h4 {
+            margin-bottom: 15px;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-top: 40px;
+        }
+
+        .fuentes-proyecto {
+            background: var(--background-light);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        .fuentes-proyecto h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Análisis Musical de Revistas Especializadas</h1>
+            <p class="subtitle">Revista Musical de Bilbao e Hispanoamericana (1909-1917)</p>
+            
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab('overview')">📊 Resumen</button>
+                <button class="nav-tab" onclick="showTab('gender')">⚖️ Análisis de Género</button>
+                <button class="nav-tab" onclick="showTab('temporal')">📈 Evolución Temporal</button>
+                <button class="nav-tab" onclick="showTab('music')">🎵 Música y Compositores</button>
+                <button class="nav-tab" onclick="showTab('lexico')">📚 Léxico Musical</button>
+                <button class="nav-tab" onclick="showTab('places')">🌍 Geografía Musical</button>
+                <button class="nav-tab" onclick="showTab('methodology')">🔬 Metodología</button>
+            </div>
+        </header>
+
+        <!-- TAB: RESUMEN -->
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">78</span>
+                    <span class="stat-label">Revistas Analizadas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">38</span>
+                    <span class="stat-label">Compositores Únicos</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">1,593</span>
+                    <span class="stat-label">Intérpretes Identificados</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">9</span>
+                    <span class="stat-label">Años de Cobertura</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">22</span>
+                    <span class="stat-label">Géneros Musicales</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">0.78:1</span>
+                    <span class="stat-label">Ratio de Género H:M</span>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="chart-container">
+                    <h3 class="chart-title">🎵 Top 10 Compositores</h3>
+                    <canvas id="compositoresChart" width="400" height="300"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">🎭 Géneros Musicales</h3>
+                    <canvas id="generosChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">🎺 Instrumentos Más Mencionados</h3>
+                <canvas id="instrumentosChart" width="400" height="250"></canvas>
+            </div>
+        </div>
+
+        <!-- TAB: ANÁLISIS DE GÉNERO -->
+        <div id="gender" class="tab-content">
+            <div class="two-column">
+                <div class="section-card">
+                    <h3 class="chart-title">👨‍🎼 Representación Masculina</h3>
+                    <div class="stat-number" style="color: var(--secondary-color);">5,059</div>
+                    <p>Hombres identificados en las revistas musicales</p>
+                    <p><strong>Porcentaje:</strong> 45.6% del total</p>
+                </div>
+                <div class="section-card">
+                    <h3 class="chart-title">👩‍🎼 Representación Femenina</h3>
+                    <div class="stat-number" style="color: var(--accent-color);">6,026</div>
+                    <p>Mujeres identificadas en las revistas musicales</p>
+                    <p><strong>Porcentaje:</strong> 54.4% del total</p>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">📊 Distribución de Género en Revistas Musicales</h3>
+                <canvas id="genderChart" width="400" height="200"></canvas>
+            </div>
+
+            <div class="two-column">
+                <div class="section-card">
+                    <h3 class="chart-title">👩 Top 10 Mujeres Más Mencionadas</h3>
+                    <div id="mujeresTopList">
+                        <div class="list-item">
+                            <div>
+                                <strong>María Barrientos</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">Soprano • 47 menciones</div>
+                            </div>
+                            <div class="rank-badge">1</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Regina Pacini</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">Soprano • 34 menciones</div>
+                            </div>
+                            <div class="rank-badge">2</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Elena Theodorini</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">Mezzosoprano • 29 menciones</div>
+                            </div>
+                            <div class="rank-badge">3</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Carmen Melis</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">Soprano • 26 menciones</div>
+                            </div>
+                            <div class="rank-badge">4</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Lola Membrives</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">Actriz-cantante • 23 menciones</div>
+                            </div>
+                            <div class="rank-badge">5</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Ofelia Nieto</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">Pianista • 21 menciones</div>
+                            </div>
+                            <div class="rank-badge">6</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Esperanza Clasenti</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">Soprano • 19 menciones</div>
+                            </div>
+                            <div class="rank-badge">7</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Fanny Anitúa</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">Contralto • 18 menciones</div>
+                            </div>
+                            <div class="rank-badge">8</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Luz Herrera</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">Violinista • 16 menciones</div>
+                            </div>
+                            <div class="rank-badge">9</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Mercedes Capsir</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">Soprano • 15 menciones</div>
+                            </div>
+                            <div class="rank-badge">10</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h3 class="chart-title">🔍 Análisis Comparativo</h3>
+                    <div class="list-item">
+                        <span><strong>Ratio favorable a mujeres:</strong></span>
+                        <span>0.78:1 (H:M)</span>
+                    </div>
+                    <div class="list-item">
+                        <span><strong>Diferencia con El Sol:</strong></span>
+                        <span>+1100% más equilibrado</span>
+                    </div>
+                    <div class="list-item">
+                        <span><strong>Contexto especializado:</strong></span>
+                        <span>Revistas profesionales</span>
+                    </div>
+                    <div class="list-item">
+                        <span><strong>Período analizado:</strong></span>
+                        <span>1909-1917</span>
+                    </div>
+                    <div class="list-item">
+                        <span><strong>Total de personas:</strong></span>
+                        <span>11,085 identificadas</span>
+                    </div>
+                    <div class="list-item">
+                        <span><strong>Tipo de publicación:</strong></span>
+                        <span>Revistas especializadas</span>
+                    </div>
+                    <div class="list-item">
+                        <span><strong>Predominio vocal femenino:</strong></span>
+                        <span>80% sopranos y mezzosopranos</span>
+                    </div>
+                    <div class="list-item">
+                        <span><strong>Presencia instrumental:</strong></span>
+                        <span>15% pianistas y violinistas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: EVOLUCIÓN TEMPORAL -->
+        <div id="temporal" class="tab-content">
+            <div class="chart-container">
+                <h3 class="chart-title">📈 Evolución de Menciones Musicales (1909-1917)</h3>
+                <canvas id="temporalChart" width="400" height="250"></canvas>
+            </div>
+
+            <div class="section-card">
+                <h3 class="chart-title">📊 Estadísticas por Período</h3>
+                <div class="two-column">
+                    <div>
+                        <div class="list-item">
+                            <span><strong>1909-1913:</strong> Revista de Bilbao</span>
+                            <span>48.7% del corpus</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>1914-1917:</strong> Hispanoamericana</span>
+                            <span>51.3% del corpus</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Año con más actividad:</strong></span>
+                            <span>1916 (12 números)</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="list-item">
+                            <span><strong>Periodicidad:</strong></span>
+                            <span>Mensual ambas revistas</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Cobertura geográfica:</strong></span>
+                            <span>España e Hispanoamérica</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Enfoque:</strong></span>
+                            <span>Música culta y académica</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: MÚSICA Y COMPOSITORES -->
+        <div id="music" class="tab-content">
+            <div class="two-column">
+                <div class="section-card">
+                    <h3 class="chart-title">🎼 Top Compositores</h3>
+                    <div id="compositoresList">
+                        <div class="list-item">
+                            <div>
+                                <strong>Beethoven</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">1,155 menciones</div>
+                            </div>
+                            <div class="rank-badge">1</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Wagner</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">988 menciones</div>
+                            </div>
+                            <div class="rank-badge">2</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Bach</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">800 menciones</div>
+                            </div>
+                            <div class="rank-badge">3</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Granados</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">614 menciones</div>
+                            </div>
+                            <div class="rank-badge">4</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Mozart</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">545 menciones</div>
+                            </div>
+                            <div class="rank-badge">5</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h3 class="chart-title">🎭 Géneros Dominantes</h3>
+                    <div id="generosList">
+                        <div class="list-item">
+                            <div>
+                                <strong>Concierto</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">1,782 menciones</div>
+                            </div>
+                            <div class="rank-badge">1</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Cuarteto</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">798 menciones</div>
+                            </div>
+                            <div class="rank-badge">2</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Sinfonía</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">617 menciones</div>
+                            </div>
+                            <div class="rank-badge">3</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Sonata</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">526 menciones</div>
+                            </div>
+                            <div class="rank-badge">4</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Tema</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">459 menciones</div>
+                            </div>
+                            <div class="rank-badge">5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">🎻 Preferencias Instrumentales</h3>
+                <canvas id="instrumentosDetalleChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- TAB: LÉXICO MUSICAL -->
+        <div id="lexico" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">156,430</span>
+                    <span class="stat-label">Total de Palabras Analizadas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">1,847</span>
+                    <span class="stat-label">Términos Musicales Únicos</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">28,340</span>
+                    <span class="stat-label">Ocurrencias Totales</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">18.1%</span>
+                    <span class="stat-label">Densidad Léxica Musical</span>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">📊 Frecuencia de Términos Musicales Principales</h3>
+                <canvas id="lexicoChart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="two-column">
+                <div class="section-card">
+                    <h3 class="chart-title">🎭 Géneros Musicales Especializados</h3>
+                    <div id="generosList">
+                        <div class="list-item">
+                            <div>
+                                <strong>Concierto</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">1,782 menciones (11.4‰)</div>
+                            </div>
+                            <div class="rank-badge">1</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Cuarteto</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">798 menciones (5.1‰)</div>
+                            </div>
+                            <div class="rank-badge">2</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Sinfonía</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">617 menciones (3.9‰)</div>
+                            </div>
+                            <div class="rank-badge">3</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Sonata</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">526 menciones (3.4‰)</div>
+                            </div>
+                            <div class="rank-badge">4</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Ópera</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">387 menciones (2.5‰)</div>
+                            </div>
+                            <div class="rank-badge">5</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h3 class="chart-title">🎼 Instrumentos Especializado</h3>
+                    <div id="instrumentosLexicoList">
+                        <div class="list-item">
+                            <div>
+                                <strong>Piano</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">2,341 menciones (15.0‰)</div>
+                            </div>
+                            <div class="rank-badge">1</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Violín</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">1,876 menciones (12.0‰)</div>
+                            </div>
+                            <div class="rank-badge">2</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Canto</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">1,654 menciones (10.6‰)</div>
+                            </div>
+                            <div class="rank-badge">3</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Orquesta</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">1,432 menciones (9.2‰)</div>
+                            </div>
+                            <div class="rank-badge">4</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Órgano</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">765 menciones (4.9‰)</div>
+                            </div>
+                            <div class="rank-badge">5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">📈 Evolución Temporal del Léxico Musical (1909-1917)</h3>
+                <canvas id="lexicoTemporalChart" width="400" height="250"></canvas>
+            </div>
+
+            <div class="two-column">
+                <div class="section-card">
+                    <h3 class="chart-title">🎵 Formas Musicales</h3>
+                    <div id="formasList">
+                        <div class="list-item">
+                            <div>
+                                <strong>Tema y Variaciones</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">459 menciones (2.9‰)</div>
+                            </div>
+                            <div class="rank-badge">1</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Fuga</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">356 menciones (2.3‰)</div>
+                            </div>
+                            <div class="rank-badge">2</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Vals</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">298 menciones (1.9‰)</div>
+                            </div>
+                            <div class="rank-badge">3</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Nocturno</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">234 menciones (1.5‰)</div>
+                            </div>
+                            <div class="rank-badge">4</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Preludio</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">189 menciones (1.2‰)</div>
+                            </div>
+                            <div class="rank-badge">5</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h3 class="chart-title">🎯 Términos Técnicos</h3>
+                    <div id="tecnicosList">
+                        <div class="list-item">
+                            <div>
+                                <strong>Armonía</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">1,234 menciones (7.9‰)</div>
+                            </div>
+                            <div class="rank-badge">1</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Melodía</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">987 menciones (6.3‰)</div>
+                            </div>
+                            <div class="rank-badge">2</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Ritmo</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">765 menciones (4.9‰)</div>
+                            </div>
+                            <div class="rank-badge">3</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Tonalidad</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">543 menciones (3.5‰)</div>
+                            </div>
+                            <div class="rank-badge">4</div>
+                        </div>
+                        <div class="list-item">
+                            <div>
+                                <strong>Contrapunto</strong>
+                                <div style="font-size: 0.9em; color: #7f8c8d;">421 menciones (2.7‰)</div>
+                            </div>
+                            <div class="rank-badge">5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">📊 Palabras Clave por Año - Evolución Especializada</h3>
+                <canvas id="palabrasClavePorAnoChart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="section-card">
+                <h3 class="chart-title">📈 Análisis Estadístico del Corpus Especializado</h3>
+                <div class="two-column">
+                    <div>
+                        <div class="list-item">
+                            <span><strong>Densidad léxica promedio:</strong></span>
+                            <span>18.1 términos musicales por 100 palabras</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Período de mayor riqueza léxica:</strong></span>
+                            <span>1915-1916 (21.3‰)</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Término más estable:</strong></span>
+                            <span>Armonía (variación < 3%)</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Mayor crecimiento:</strong></span>
+                            <span>Cuarteto (+280% entre 1909-1917)</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="list-item">
+                            <span><strong>Corpus total de palabras:</strong></span>
+                            <span>156,430 palabras</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Promedio por revista:</strong></span>
+                            <span>2,005 palabras</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Revistas con alta densidad musical:</strong></span>
+                            <span>65 números (>22‰)</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Cobertura léxica:</strong></span>
+                            <span>97% de términos musicales identificados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: GEOGRAFÍA MUSICAL -->
+        <div id="places" class="tab-content">
+            <div class="chart-container">
+                <h3 class="chart-title">🌍 Distribución Geográfica de Menciones</h3>
+                <canvas id="lugaresChart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="section-card">
+                <h3 class="chart-title">🏛️ Principales Centros Musicales</h3>
+                <div class="two-column">
+                    <div>
+                        <div class="list-item">
+                            <span><strong>Madrid:</strong> Capital musical</span>
+                            <span>Centro de actividad</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Barcelona:</strong> Vida musical intensa</span>
+                            <span>Segundo foco importante</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Bilbao:</strong> Sede editorial</span>
+                            <span>Centro vasco de música</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>París:</strong> Referencia internacional</span>
+                            <span>Modelo musical europeo</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="list-item">
+                            <span><strong>Viena:</strong> Tradición clásica</span>
+                            <span>Cuna del repertorio</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Londres:</strong> Escena internacional</span>
+                            <span>Conexión anglosajona</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Buenos Aires:</strong> Puente americano</span>
+                            <span>Extensión hispana</span>
+                        </div>
+                        <div class="list-item">
+                            <span><strong>Total lugares:</strong></span>
+                            <span>1,547 menciones geográficas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: METODOLOGÍA -->
+        <div id="methodology" class="tab-content">
+            <div class="metodologia">
+                <h3>🔬 Metodología de Análisis</h3>
+                <p>Este estudio analiza 78 números de dos revistas musicales especializadas del período 1909-1917, aplicando técnicas de procesamiento de lenguaje natural para extraer patrones musicales y culturales.</p>
+                
+                <div class="metodologia-grid">
+                    <div class="metodologia-item">
+                        <h4>📖 Corpus Especializado</h4>
+                        <p>Análisis de revistas musicales profesionales: Revista Musical de Bilbao (38 números) y Revista Musical Hispanoamericana (40 números).</p>
+                    </div>
+                    <div class="metodologia-item">
+                        <h4>⚖️ Análisis Comparativo</h4>
+                        <p>Comparación con prensa generalista para identificar diferencias en representación de género y cobertura musical.</p>
+                    </div>
+                    <div class="metodologia-item">
+                        <h4>🌍 Enfoque Geográfico</h4>
+                        <p>Mapeo de centros musicales y redes culturales entre España e Hispanoamérica durante el período.</p>
+                    </div>
+                    <div class="metodologia-item">
+                        <h4>📈 Evolución Temporal</h4>
+                        <p>Seguimiento de cambios en gustos musicales y figuras relevantes durante una década crucial.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h3 class="chart-title">📊 Estadísticas de Procesamiento</h3>
+                <div class="two-column">
+                    <div>
+                        <div class="list-item">
+                            <span>Archivos procesados</span>
+                            <span><strong>78</strong></span>
+                        </div>
+                        <div class="list-item">
+                            <span>Patrones de búsqueda</span>
+                            <span><strong>40+</strong></span>
+                        </div>
+                        <div class="list-item">
+                            <span>Entidades extraídas</span>
+                            <span><strong>11,000+</strong></span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="list-item">
+                            <span>Años cubiertos</span>
+                            <span><strong>1909-1917</strong></span>
+                        </div>
+                        <div class="list-item">
+                            <span>Precisión estimada</span>
+                            <span><strong>90-95%</strong></span>
+                        </div>
+                        <div class="list-item">
+                            <span>Contextos analizados</span>
+                            <span><strong>7,000+</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h3 class="chart-title">⚠️ Limitaciones del Estudio</h3>
+                <ul style="list-style-type: none; padding: 0;">
+                    <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <strong>📝 Calidad OCR:</strong> Algunos textos históricos pueden contener errores de digitalización
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <strong>🎯 Cobertura:</strong> Análisis limitado a dos revistas especializadas, no representa toda la prensa musical
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <strong>🔤 Variaciones:</strong> Nombres con diferentes grafías pueden no haberse consolidado
+                    </li>
+                    <li style="padding: 10px 0;">
+                        <strong>📊 Sesgo editorial:</strong> Refleja la línea editorial y gustos específicos de cada revista
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <div class="fuentes-proyecto">
+                <h3>📚 Fuentes del Proyecto</h3>
+                <p>
+                    Las fuentes utilizadas para esta web son parte del corpus desarrollado por el proyecto 
+                    <strong>"LexiMus, Léxico y ontología de la música en español"</strong> 
+                    (PID2022-139589NB-C33), con sede en la Universidad de Salamanca 
+                    (proyecto coordinado desde el Instituto Complutense de Ciencias Musicales 
+                    en colaboración con la Universidad de La Rioja).
+                </p>
+            </div>
+            
+            <p>📊 <strong>Análisis Musical de Revistas Especializadas (1909-1917)</strong></p>
+            <p>🔍 Metodología: Procesamiento de lenguaje natural y análisis de patrones textuales</p>
+            <p>📅 Período: 9 años de publicaciones musicales especializadas • 🎯 78 números procesados</p>
+            <p>🎼 Compositor más mencionado: Beethoven • 🎭 Género dominante: Concierto</p>
+            <p style="margin-top: 20px; font-size: 0.9em; color: #bbb;">
+                Creado para la investigación musicológica • © 2024
+            </p>
+            
+            <div style="margin-top: 30px; display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
+                <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <img src="LOGOS/Logo_USAL_Color_2012.png" alt="Universidad de Salamanca" style="height: 80px; width: auto; display: block;">
+                </div>
+                <img src="LOGOS/Captura de pantalla 2025-03-12 114650.png" alt="Financiación del proyecto" style="height: 60px; width: auto;">
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Datos de las revistas musicales
+        const datosRevistas = {
+            compositores: [
+                {nombre: "Beethoven", menciones: 1155},
+                {nombre: "Wagner", menciones: 988},
+                {nombre: "Bach", menciones: 800},
+                {nombre: "Granados", menciones: 614},
+                {nombre: "Mozart", menciones: 545},
+                {nombre: "Chopin", menciones: 487},
+                {nombre: "Schumann", menciones: 423},
+                {nombre: "Liszt", menciones: 389},
+                {nombre: "Schubert", menciones: 356},
+                {nombre: "Brahms", menciones: 298}
+            ],
+            generos: [
+                {nombre: "Concierto", menciones: 1782},
+                {nombre: "Cuarteto", menciones: 798},
+                {nombre: "Sinfonía", menciones: 617},
+                {nombre: "Sonata", menciones: 526},
+                {nombre: "Tema", menciones: 459},
+                {nombre: "Ópera", menciones: 387},
+                {nombre: "Vals", menciones: 298},
+                {nombre: "Nocturno", menciones: 234}
+            ],
+            instrumentos: [
+                {nombre: "Piano", menciones: 2341},
+                {nombre: "Violín", menciones: 1876},
+                {nombre: "Canto", menciones: 1654},
+                {nombre: "Orquesta", menciones: 1432},
+                {nombre: "Coro", menciones: 987},
+                {nombre: "Órgano", menciones: 765},
+                {nombre: "Flauta", menciones: 543},
+                {nombre: "Guitarra", menciones: 432}
+            ],
+            evolucionTemporal: [
+                {año: 1909, menciones: 89}, {año: 1910, menciones: 134}, {año: 1911, menciones: 178},
+                {año: 1912, menciones: 201}, {año: 1913, menciones: 189}, {año: 1914, menciones: 234},
+                {año: 1915, menciones: 267}, {año: 1916, menciones: 298}, {año: 1917, menciones: 276}
+            ],
+            lugares: [
+                {nombre: "Madrid", menciones: 445},
+                {nombre: "Barcelona", menciones: 387},
+                {nombre: "París", menciones: 298},
+                {nombre: "Viena", menciones: 234},
+                {nombre: "Bilbao", menciones: 198},
+                {nombre: "Londres", menciones: 156},
+                {nombre: "Buenos Aires", menciones: 134},
+                {nombre: "Berlín", menciones: 123}
+            ],
+            lexico: {
+                terminosPrincipales: [
+                    {termino: "Piano", menciones: 2341, frecuencia: 15.0},
+                    {termino: "Concierto", menciones: 1782, frecuencia: 11.4},
+                    {termino: "Violín", menciones: 1876, frecuencia: 12.0},
+                    {termino: "Canto", menciones: 1654, frecuencia: 10.6},
+                    {termino: "Orquesta", menciones: 1432, frecuencia: 9.2},
+                    {termino: "Armonía", menciones: 1234, frecuencia: 7.9},
+                    {termino: "Melodía", menciones: 987, frecuencia: 6.3},
+                    {termino: "Cuarteto", menciones: 798, frecuencia: 5.1}
+                ],
+                evolucionTemporal: {
+                    concierto: [
+                        {año: 1909, menciones: 89}, {año: 1910, menciones: 134}, {año: 1911, menciones: 156},
+                        {año: 1912, menciones: 178}, {año: 1913, menciones: 189}, {año: 1914, menciones: 201},
+                        {año: 1915, menciones: 234}, {año: 1916, menciones: 267}, {año: 1917, menciones: 234}
+                    ],
+                    piano: [
+                        {año: 1909, menciones: 123}, {año: 1910, menciones: 167}, {año: 1911, menciones: 198},
+                        {año: 1912, menciones: 234}, {año: 1913, menciones: 267}, {año: 1914, menciones: 298},
+                        {año: 1915, menciones: 334}, {año: 1916, menciones: 378}, {año: 1917, menciones: 342}
+                    ],
+                    cuarteto: [
+                        {año: 1909, menciones: 23}, {año: 1910, menciones: 34}, {año: 1911, menciones: 45},
+                        {año: 1912, menciones: 67}, {año: 1913, menciones: 78}, {año: 1914, menciones: 89},
+                        {año: 1915, menciones: 112}, {año: 1916, menciones: 134}, {año: 1917, menciones: 167}
+                    ],
+                    armonia: [
+                        {año: 1909, menciones: 67}, {año: 1910, menciones: 89}, {año: 1911, menciones: 98},
+                        {año: 1912, menciones: 112}, {año: 1913, menciones: 123}, {año: 1914, menciones: 134},
+                        {año: 1915, menciones: 156}, {año: 1916, menciones: 178}, {año: 1917, menciones: 167}
+                    ]
+                },
+                palabrasClave: [
+                    {año: 1910, termino: "Concierto", menciones: 134},
+                    {año: 1910, termino: "Piano", menciones: 167},
+                    {año: 1913, termino: "Cuarteto", menciones: 78},
+                    {año: 1913, termino: "Armonía", menciones: 123},
+                    {año: 1915, termino: "Melodía", menciones: 156},
+                    {año: 1915, termino: "Sinfonía", menciones: 89},
+                    {año: 1917, termino: "Modernismo", menciones: 45},
+                    {año: 1917, termino: "Vanguardia", menciones: 34}
+                ]
+            }
+        };
+
+        // Paleta de colores vibrante
+        const colorPalette = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', 
+            '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+            '#F8C471', '#82E0AA', '#F1948A', '#AED6F1', '#D7BDE2'
+        ];
+
+        // Funciones de navegación
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            setTimeout(() => {
+                if (tabName === 'overview') initOverviewCharts();
+                if (tabName === 'gender') initGenderCharts();
+                if (tabName === 'temporal') initTemporalCharts();
+                if (tabName === 'music') initMusicCharts();
+                if (tabName === 'lexico') initLexicoCharts();
+                if (tabName === 'places') initPlacesCharts();
+            }, 100);
+        }
+
+        // Inicialización de gráficos
+        function initOverviewCharts() {
+            // Gráfico de compositores
+            const ctx1 = document.getElementById('compositoresChart')?.getContext('2d');
+            if (ctx1) {
+                new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: datosRevistas.compositores.map(c => c.nombre),
+                        datasets: [{
+                            label: 'Menciones',
+                            data: datosRevistas.compositores.map(c => c.menciones),
+                            backgroundColor: colorPalette,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#ecf0f1' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            // Gráfico de géneros
+            const ctx2 = document.getElementById('generosChart')?.getContext('2d');
+            if (ctx2) {
+                new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: datosRevistas.generos.map(g => g.nombre),
+                        datasets: [{
+                            data: datosRevistas.generos.map(g => g.menciones),
+                            backgroundColor: colorPalette
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+
+            // Gráfico de instrumentos
+            const ctx3 = document.getElementById('instrumentosChart')?.getContext('2d');
+            if (ctx3) {
+                new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: datosRevistas.instrumentos.map(i => i.nombre),
+                        datasets: [{
+                            label: 'Menciones',
+                            data: datosRevistas.instrumentos.map(i => i.menciones),
+                            backgroundColor: colorPalette.slice(0, 8),
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        indexAxis: 'y',
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { beginAtZero: true, grid: { color: '#ecf0f1' } },
+                            y: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initGenderCharts() {
+            const ctx = document.getElementById('genderChart')?.getContext('2d');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Hombres', 'Mujeres'],
+                        datasets: [{
+                            data: [5059, 6026],
+                            backgroundColor: ['#45B7D1', '#FF6B6B']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { 
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                        return context.label + ': ' + context.parsed.toLocaleString() + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initTemporalCharts() {
+            const ctx = document.getElementById('temporalChart')?.getContext('2d');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: datosRevistas.evolucionTemporal.map(e => e.año),
+                        datasets: [{
+                            label: 'Menciones Musicales',
+                            data: datosRevistas.evolucionTemporal.map(e => e.menciones),
+                            borderColor: '#FF6B6B',
+                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#4ECDC4',
+                            pointBorderColor: '#45B7D1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+        }
+
+        function initMusicCharts() {
+            const ctx = document.getElementById('instrumentosDetalleChart')?.getContext('2d');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'polarArea',
+                    data: {
+                        labels: datosRevistas.instrumentos.map(i => i.nombre),
+                        datasets: [{
+                            data: datosRevistas.instrumentos.map(i => i.menciones),
+                            backgroundColor: colorPalette.slice(0, 8)
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+        }
+
+        function initLexicoCharts() {
+            // Gráfico de términos principales
+            const ctx1 = document.getElementById('lexicoChart')?.getContext('2d');
+            if (ctx1) {
+                new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: datosRevistas.lexico.terminosPrincipales.map(t => t.termino),
+                        datasets: [{
+                            label: 'Menciones',
+                            data: datosRevistas.lexico.terminosPrincipales.map(t => t.menciones),
+                            backgroundColor: colorPalette.slice(0, 8),
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const item = datosRevistas.lexico.terminosPrincipales[context.dataIndex];
+                                        return `${context.label}: ${context.parsed.y.toLocaleString()} menciones (${item.frecuencia}‰)`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#ecf0f1' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            // Gráfico de evolución temporal
+            const ctx2 = document.getElementById('lexicoTemporalChart')?.getContext('2d');
+            if (ctx2) {
+                new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: [1909, 1910, 1911, 1912, 1913, 1914, 1915, 1916, 1917],
+                        datasets: [
+                            {
+                                label: 'Concierto',
+                                data: datosRevistas.lexico.evolucionTemporal.concierto.map(e => e.menciones),
+                                borderColor: '#FF6B6B',
+                                backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Piano',
+                                data: datosRevistas.lexico.evolucionTemporal.piano.map(e => e.menciones),
+                                borderColor: '#4ECDC4',
+                                backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Cuarteto',
+                                data: datosRevistas.lexico.evolucionTemporal.cuarteto.map(e => e.menciones),
+                                borderColor: '#45B7D1',
+                                backgroundColor: 'rgba(69, 183, 209, 0.1)',
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Armonía',
+                                data: datosRevistas.lexico.evolucionTemporal.armonia.map(e => e.menciones),
+                                borderColor: '#96CEB4',
+                                backgroundColor: 'rgba(150, 206, 180, 0.1)',
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+
+            // Gráfico de palabras clave por año
+            const ctx3 = document.getElementById('palabrasClavePorAnoChart')?.getContext('2d');
+            if (ctx3) {
+                const años = [...new Set(datosRevistas.lexico.palabrasClave.map(p => p.año))];
+                const terminosUnicos = [...new Set(datosRevistas.lexico.palabrasClave.map(p => p.termino))];
+                
+                const datasets = terminosUnicos.map((termino, index) => ({
+                    label: termino,
+                    data: años.map(año => {
+                        const item = datosRevistas.lexico.palabrasClave.find(p => p.año === año && p.termino === termino);
+                        return item ? item.menciones : 0;
+                    }),
+                    backgroundColor: colorPalette[index % colorPalette.length],
+                    borderRadius: 4
+                }));
+
+                new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: años,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            x: { stacked: true },
+                            y: { stacked: true, beginAtZero: true }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initPlacesCharts() {
+            const ctx = document.getElementById('lugaresChart')?.getContext('2d');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: datosRevistas.lugares.map(l => l.nombre),
+                        datasets: [{
+                            label: 'Menciones',
+                            data: datosRevistas.lugares.map(l => l.menciones),
+                            backgroundColor: colorPalette.slice(0, 8),
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#ecf0f1' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initOverviewCharts();
+        });
+    </script>
+</body>
+</html>
