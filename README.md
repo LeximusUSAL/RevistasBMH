@@ -136,6 +136,20 @@ Este proyecto está desarrollado para fines de investigación académica. Los da
 
 Proyecto desarrollado en el marco de investigación musicológica. Para consultas académicas o colaboraciones, contactar con el equipo del proyecto LexiMus.
 
+
+Para consultas académicas o colaboraciones:
+- **Institución**: Universidad de Salamanca
+- **Proyecto**: LexiMus https://leximus.es/
+- **Repositorio**: [GitHub](https://github.com/MariaPalaciosNieto/analisis-musical-el-sol)
+
+## 📜 Licencia y Citación
+
+Si utilizas este trabajo en tu investigación, por favor cita:
+```
+Análisis Musical de Revista Musical de Bilbao y Revista Musical Hispanoamericana
+Proyecto LexiMus, Universidad de Salamanca. 
+Disponible en: `https://mariapalaciosnieto.github.io/RevistasBMH/
+
 ## Enlaces
 
 Revistas alojadas en la Hemeroteca Digital de la Biblioteca Nacional de España. 
