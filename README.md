@@ -4,7 +4,7 @@ Una aplicación web interactiva para el análisis de contenido musical de dos re
 
 ## 🌐 Demo en Vivo
 
-[Ver análisis en GitHub Pages](https://maria.github.io/Revistas-BMH/web_revistas_musicales.html)
+[Ver análisis en GitHub Pages](https://mariapalaciosnieto.github.io/Revistas-BMH/web_revistas_musicales.html)
 
 ## 📊 Características
 
