@@ -136,6 +136,13 @@ Este proyecto está desarrollado para fines de investigación académica. Los da
 
 Proyecto desarrollado en el marco de investigación musicológica. Para consultas académicas o colaboraciones, contactar con el equipo del proyecto LexiMus.
 
+## Enlaces
+
+Revistas alojadas en la Hemeroteca Digital de la Biblioteca Nacional de España. 
+[Revista Musical de Bilbao](https://hemerotecadigital.bne.es/hd/es/card?sid=4122654)
+[Revista Musical Hispanoamericana](https://hemerotecadigital.bne.es/hd/es/card?sid=3868950)
+
+
 ---
 
 **🎼 "Analizando el pasado musical para comprender el presente"** • © 2024 Universidad de Salamanca
