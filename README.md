@@ -4,7 +4,7 @@ Una aplicación web interactiva para el análisis de contenido musical de dos re
 
 ## 🌐 Demo en Vivo
 
-[Ver análisis en GitHub Pages](https://mariapalaciosnieto.github.io/RevistasBMH/)
+[Ver análisis en GitHub Pages](https://leximususal.github.io/RevistasBMH/)
 
 ## 📊 Características
 
@@ -140,7 +140,7 @@ Proyecto desarrollado en el marco de investigación musicológica. Para consulta
 Para consultas académicas o colaboraciones:
 - **Institución**: Universidad de Salamanca
 - **Proyecto**: LexiMus https://leximus.es/
-- **Repositorio**: [GitHub](https://github.com/MariaPalaciosNieto/analisis-musical-el-sol)
+- **Repositorio**: [GitHub](https://github.com/leximususal/principal)
 
 ## 📜 Licencia y Citación
 
@@ -148,7 +148,7 @@ Si utilizas este trabajo en tu investigación, por favor cita:
 ```
 Análisis Musical de Revista Musical de Bilbao y Revista Musical Hispanoamericana
 Proyecto LexiMus, Universidad de Salamanca. 
-Disponible en: `https://mariapalaciosnieto.github.io/RevistasBMH/
+Disponible en: `https://leximususal.github.io/RevistasBMH/
 
 ## Enlaces
 
